@@ -1,22 +1,24 @@
-// An Immediately Invoked Function Expression to instantiate a pokemon repository and protect it from being accessed globally
-var pokemonRepository = (function () {
+// An Immediately Invoked Function Expression to instantiate a potterCharacter repository and protect it from being accessed globally
+var potterCharacterRepository = (function () {
 	var repository = []; 
 	var apiUrl = 'http://hp-api.herokuapp.com/api/characters/';
 
-	// Add new pokemon to the repository
-	function add(pokemon) {
-		repository.push(pokemon);
+	// Add new potterCharacter to the repository
+	function add(potterCharacter) {
+		repository.push(potterCharacter);
 	} 
 
 	function loadList() {
-		return fetch(apiUrl).then(function (response) { 
-			console.log(response);
+		return fetch(apiUrl).then(function (response) {
 			return response.json();
-		}).then(function (json) { 
-			console.log(json);
-			json.forEach(function (item) {
+		}).then(function (json) {
+			json.forEach(function (character) { 
 				var potterCharacter = {
-					name: item.name
+					name: character.name, 
+					imageUrl: character.image,
+					species: character.species, 
+					wand: character.wand,  
+					patronus: character.patronus
 				};
 				add(potterCharacter);
 			});
@@ -25,55 +27,33 @@ var pokemonRepository = (function () {
 		})
 	}
 
-	// Return all pokemon in the repository
+	// Return all potterCharacter in the repository
 	function getAll() {
 		return repository; 
 	} 
 
-	// Display all pokemon in the repository
-	function addListItem(pokemon) { 
-		console.log(pokemon.name);
-		var pokemonListItem = document.createElement('LI'); 
-		var pokemonLIButton = document.createElement('BUTTON'); 
-		pokemonLIButton.classList.add('pokemon-buttons');
-		pokemonLIButton.innerText = pokemon.name; 
-		pokemonListItem.appendChild(pokemonLIButton); 
-		pokemonList.appendChild(pokemonListItem); 
-		// addPokemonListener(pokemonLIButton, pokemon);
+	// Display all potterCharacter in the repository
+	function addListItem(potterCharacter) {
+		var potterCharacterListItem = document.createElement('LI'); 
+		var potterCharacterLIButton = document.createElement('BUTTON'); 
+		potterCharacterLIButton.classList.add('potter-character-buttons');
+		potterCharacterLIButton.innerText = potterCharacter.name; 
+		potterCharacterLIButton.style.backgroundImage = potterCharacter.imageUrl;
+		potterCharacterListItem.appendChild(potterCharacterLIButton); 
+		potterCharacterList.appendChild(potterCharacterListItem); 
+		addPotterCharacterListener(potterCharacterLIButton, potterCharacter);
 	}  
 
 	// Creates event listeners for the buttons as they are being created.
-	function addPokemonListener (button, pokemon) {
+	function addPotterCharacterListener (button, potterCharacter) {
 		button.addEventListener('click', function() {
-			showDetails(pokemon);
+			showModal(potterCharacter);
 		});
 	} 
 
-	// A simple function that logs the contents of the pokemon objects to the console.
-	function showDetails(pokemon) {
-		loadDetails(pokemon).then(function () { 
-			showModal(pokemon);   
-    	});
-	} 
-
-	function loadDetails(item) {
-		var url = item.detailsUrl;
-		return fetch(url).then(function (response) {
-			return response.json();
-		}).then(function (details) { 
-	       // Now we add the details to the item
-	       item.imageUrl = details.sprites.front_default;
-	       item.height = details.height;
-	       item.types = details.types;
-  		}).catch(function (e) {
-  		   console.error(e);
-  		});
-	}  
-
-
 	// MODALS
 
-	function showModal(pokemon) {
+	function showModal(potterCharacter) {
 		var $modalContainer = document.querySelector('#modal-container'); 
 		// Clear any existing text if being used again. 
 		$modalContainer.innerHTML = ''; 
@@ -90,14 +70,14 @@ var pokemonRepository = (function () {
 		var modal = document.createElement('div'); 
 		modal.classList.add('modal'); 
 
-		// Give the modal some content based on the pokemon and UI elements  
+		// Give the modal some content based on the potterCharacter and UI elements  
 		var closeButton = document.createElement('BUTTON'); 
 		closeButton.classList.add('modal-close'); 
 		closeButton.innerText = 'Close'; 
 		closeButton.addEventListener('click', hideModal);
 
 		var modalTitle = document.createElement('H1'); 
-		modalTitle.innerText = pokemon.name; 
+		modalTitle.innerText = potterCharacter.name; 
 
 		var modalBodyDiv = document.createElement('div'); 
 		modalBodyDiv.classList.add('modal-body-div');
@@ -106,34 +86,53 @@ var pokemonRepository = (function () {
 		var modalBodyTextDiv = document.createElement('div'); 
 		modalBodyTextDiv.classList.add('modal-body-text-div');
 		modalBodyTextDiv.appendChild(modalBody);
-		modalBody.innerText = 'Height: ' + (pokemon.height / 10) + ' m';
+		modalBody.innerText = 'Test';
 
-		var modalTypeTable = document.createElement('table'); 
-		modalTypeTable.classList.add('types-table');
-		var modalTypeTblHead = document.createElement('th'); 
-		modalTypeTblHead.classList.add('types-header');
-		modalTypeTblHead.innerText = 'Type:';
-		if (pokemon.types.length > 1) {
-			modalTypeTblHead.innerText = 'Types:';
+		var modalWandTable = document.createElement('table'); 
+		modalWandTable.classList.add('wand-table');
+		var modalWandTblHead = document.createElement('th'); 
+		modalWandTblHead.classList.add('wand-header');
+		modalWandTblHead.innerText = 'Wand Unknown';
+		if (potterCharacter.wand.wood > '') {
+			modalWandTblHead.innerText = 'Wand: '; 
+			var woodText = potterCharacter.wand.wood.charAt(0).toUpperCase() + potterCharacter.wand.wood.slice(1); 
+			var coreText = potterCharacter.wand.core.charAt(0).toUpperCase() + potterCharacter.wand.core.slice(1);
+			var lengthText = potterCharacter.wand.length + ' in';
+			var woodRow =  modalWandTable.insertRow(0);
+			var coreRow = modalWandTable.insertRow(1);
+			var lengthRow = modalWandTable.insertRow(2); 
+			var woodCell = woodRow.insertCell(0); 
+			var coreCell = coreRow.insertCell(0); 
+			var lengthCell = lengthRow.insertCell(0);
+			woodRow.classList.add('wand-table'); 
+			coreRow.classList.add('wand-table'); 
+			lengthRow.classList.add('wand-table');
+			woodCell.innerText = woodText; 
+			if (coreText === '') {
+				coreText = 'Core Unknown';
+			} 
+			coreCell.innerText = coreText;
+			if (lengthText === ' in') {
+				lengthText = 'Length Unknown';
+			} 
+			lengthCell.innerText = lengthText;
+			modalWandTblHead.appendChild(woodRow); 
+			modalWandTblHead.appendChild(coreRow); 
+			modalWandTblHead.appendChild(lengthRow);
 		} 
 
-		modalTypeTable.appendChild(modalTypeTblHead);  
+		modalWandTable.appendChild(modalWandTblHead);  
 
 		var modalTableDiv = document.createElement('div'); 
 		modalTableDiv.classList.add('modal-table-div'); 
-		modalTableDiv.appendChild(modalTypeTable);
+		modalTableDiv.appendChild(modalWandTable);
 
-		pokemon.types.forEach((type) => { 
-			var typeText = type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1);
-			var modalTableContent = document.createElement('td'); 
-			modalTableContent.innerText = typeText; 
-			modalTableContent.classList.add('types-table'); 
-			modalTableContent.style.background = typeColor(typeText);
-			modalTypeTblHead.appendChild(modalTableContent);
-		}); 
+
+
 
 		var modalImage = document.createElement('IMG'); 
-		modalImage.src = pokemon.imageUrl; 
+		modalImage.src = potterCharacter.imageUrl;  
+		modalImage.style.maxWidth = '150px';
 		var modalImageDiv = document.createElement('div'); 
 		modalImageDiv.classList.add('modal-image-div')
 		modalImageDiv.appendChild(modalImage);
@@ -155,47 +154,6 @@ var pokemonRepository = (function () {
 
 	function hideModal() {
 		document.querySelector('#modal-container').classList.remove('is-visible');
-	}  
-
-	// Gives coloring based on the value of the type.
-	function typeColor(type) {
-		switch (type) {
-			case 'Grass' : 
-				return 'rgba(0,204,0,0.3)'; 
-			case 'Poison': 
-				return 'rgba(255,0,255,0.3)'; 
-			case 'Water' : 
-				return 'rgba(0,0,255, 0.3)'; 
-			case 'Fire' : 
-				return 'rgba(255,128,0,0.65)';  
-			case 'Normal' : 
-				return 'rgb(255,229,204)'; 
-			case 'Flying' : 
-				return 'rgb(204,229,255)'; 
-			case 'Fairy' : 
-				return 'rgb(255,204,229)'; 
-			case 'Bug' : 
-				return 'rgba(0,153,76, 0.5)'; 
-			case 'Ground' : 
-				return 'rgba(153,76,0, 0.5)'; 
-			case 'Psychic' : 
-				return 'rgb(255,255,204)'; 
-			case 'Fighting' : 
-				return 'rgba(59, 91, 112, 0.6)'; 
-			case 'Steel' : 
-				return 'rgb(135,137,140)'; 
-			case 'Electric' : 
-				return 'rgba(255,254,0, 0.8)'; 
-			case 'Ice' : 
-				return 'rgba(165,242,243, 0.8)'; 
-			case 'Rock' : 
-				return 'rgba(150,159,178, 0.8)'; 
-			case 'Dragon' : 
-				return 'rgba(204,122,0, 0.8)';
-			default : 
-				return 'rgba(0,0,0,0)';			 
-
-		}
 	}
 
 	// Add a listener that will close the modal if the user presses the escape button
@@ -210,25 +168,24 @@ var pokemonRepository = (function () {
 		add: add,
 		getAll: getAll,
 		addListItem: addListItem, 
-		loadList: loadList, 
-		loadDetails: loadDetails
+		loadList: loadList
 	};
 })(); 
 
-var pokemonList = document.querySelector('.potter-list'); 
+var potterCharacterList = document.querySelector('.potter-list'); 
 
-var pokemonLoadingMessage = document.createElement('p'); 
-pokemonLoadingMessage.innerText = 'Loading...'; 
-pokemonLoadingMessage.classList.add('loading-message');
-var pokemonTitle = document.getElementById('title'); 
-pokemonTitle.appendChild(pokemonLoadingMessage); 
+var potterCharacterLoadingMessage = document.createElement('p'); 
+potterCharacterLoadingMessage.innerText = 'Loading...'; 
+potterCharacterLoadingMessage.classList.add('loading-message');
+var potterCharacterTitle = document.getElementById('title'); 
+potterCharacterTitle.appendChild(potterCharacterLoadingMessage); 
 
-pokemonRepository.loadList().then(()=>{
+potterCharacterRepository.loadList().then(()=>{
   // Data loaded successfully
-	pokemonRepository.getAll().forEach((pokemon)=>{
-  		pokemonRepository.addListItem(pokemon);
+	potterCharacterRepository.getAll().forEach((potterCharacter)=>{
+  		potterCharacterRepository.addListItem(potterCharacter);
   }); 
-	pokemonTitle.removeChild(pokemonLoadingMessage);
+	potterCharacterTitle.removeChild(potterCharacterLoadingMessage);
 });  
 
 
