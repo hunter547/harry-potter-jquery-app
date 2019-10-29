@@ -90,37 +90,57 @@ var potterCharacterRepository = (function () {
 
 		var modalWandTable = document.createElement('table'); 
 		modalWandTable.classList.add('wand-table');
-		var modalWandTblHead = document.createElement('th'); 
-		modalWandTblHead.classList.add('wand-header');
-		modalWandTblHead.innerText = 'Wand Unknown';
+		
+		var wandHeaderText = 'Wand Unknown';
 		if (potterCharacter.wand.wood > '') {
-			modalWandTblHead.innerText = 'Wand: '; 
-			var woodText = potterCharacter.wand.wood.charAt(0).toUpperCase() + potterCharacter.wand.wood.slice(1); 
-			var coreText = potterCharacter.wand.core.charAt(0).toUpperCase() + potterCharacter.wand.core.slice(1);
-			var lengthText = potterCharacter.wand.length + ' in';
+			 
+			
+			wandHeaderText = 'Wand: '; 
+
+			// Wand Wood Table Content
 			var woodRow =  modalWandTable.insertRow(0);
-			var coreRow = modalWandTable.insertRow(1);
-			var lengthRow = modalWandTable.insertRow(2); 
-			var woodCell = woodRow.insertCell(0); 
-			var coreCell = coreRow.insertCell(0); 
-			var lengthCell = lengthRow.insertCell(0);
+			var woodLabel = woodRow.insertCell(0); 
+			woodLabel.innerText = 'Wood: '; 
 			woodRow.classList.add('wand-table'); 
-			coreRow.classList.add('wand-table'); 
-			lengthRow.classList.add('wand-table');
+			var woodCell = woodRow.insertCell(1); 
+			var woodText = potterCharacter.wand.wood.charAt(0).toUpperCase() + potterCharacter.wand.wood.slice(1);
 			woodCell.innerText = woodText; 
+			
+
+
+			// Wand Core Table Content
+			var coreRow = modalWandTable.insertRow(1); 
+			var coreLabel = coreRow.insertCell(0); 
+			coreLabel.innerText = 'Core: ';
+			coreRow.classList.add('wand-table');
+			var coreCell = coreRow.insertCell(1); 
+			var coreText = potterCharacter.wand.core.charAt(0).toUpperCase() + potterCharacter.wand.core.slice(1);
 			if (coreText === '') {
 				coreText = 'Core Unknown';
-			} 
-			coreCell.innerText = coreText;
+			}
+			coreCell.innerText = coreText; 
+			
+
+
+
+			// Wand Length Table Content
+			var lengthRow = modalWandTable.insertRow(2); 
+			var lengthLabel = lengthRow.insertCell(0); 
+			lengthLabel.innerText = 'Length: ';
+			lengthRow.classList.add('wand-table'); 
+			var lengthCell = lengthRow.insertCell(1); 
+			var lengthText = potterCharacter.wand.length + ' in'; 
 			if (lengthText === ' in') {
 				lengthText = 'Length Unknown';
 			} 
-			lengthCell.innerText = lengthText;
-			modalWandTblHead.appendChild(woodRow); 
-			modalWandTblHead.appendChild(coreRow); 
-			modalWandTblHead.appendChild(lengthRow);
+			lengthCell.innerText = lengthText; 	
+
 		} 
 
+		var modalWandTblHead = modalWandTable.createTHead(); 
+		modalWandTblHead.classList.add('wand-header');
+		var wandHeaderRow = modalWandTblHead.insertRow(0); 
+		wandHeaderRow.innerText = wandHeaderText;
 		modalWandTable.appendChild(modalWandTblHead);  
 
 		var modalTableDiv = document.createElement('div'); 
@@ -131,8 +151,8 @@ var potterCharacterRepository = (function () {
 
 
 		var modalImage = document.createElement('IMG'); 
-		modalImage.src = potterCharacter.imageUrl;  
-		modalImage.style.maxWidth = '150px';
+		modalImage.classList.add('character-picture');
+		modalImage.src = potterCharacter.imageUrl;
 		var modalImageDiv = document.createElement('div'); 
 		modalImageDiv.classList.add('modal-image-div')
 		modalImageDiv.appendChild(modalImage);
@@ -173,6 +193,8 @@ var potterCharacterRepository = (function () {
 })(); 
 
 var potterCharacterList = document.querySelector('.potter-list'); 
+document.body.style.backgroundImage = 'url(img/hogwarts-express-painting-27.jpg)'; 
+document.body.style.backgroundSize = 'cover';
 
 var potterCharacterLoadingMessage = document.createElement('p'); 
 potterCharacterLoadingMessage.innerText = 'Loading...'; 
