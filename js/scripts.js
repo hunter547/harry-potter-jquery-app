@@ -199,14 +199,15 @@ var potterCharacterRepository = (function () {
 
 
 	function hideModal() {
-		document.querySelector('#modal-container').classList.remove('is-visible');
+		document.querySelector('#modal-container').classList.remove('is-visible'); 
+		moveListRight();
 	}
 
 	// Add a listener that will close the modal if the user presses the escape button
 	window.addEventListener('keydown', (e) => {
 		var $modalContainer = document.querySelector('#modal-container');
 		if (e.key === 'Escape' && $modalContainer.classList.contains('is-visible')) {
-			hideModal();  
+			hideModal();
 		}
 	}); 
 
@@ -219,6 +220,35 @@ var potterCharacterRepository = (function () {
 				clearInterval(id);
 			} else {
 				pos -= 20;
+				list.style.left = pos + 'px';
+			}
+		}
+	} 
+
+	// Have an animation that moves the list from the left to the center after closing a modal
+	function moveListRight() { 
+		var currentWidth = getDocWidth(); 
+		var middlePosition = Math.round(currentWidth*.42);
+		var pos = Math.round(list.getBoundingClientRect().left); 
+		var id = setInterval(frame, 1); 
+		function frame() { 
+			if (pos == middlePosition) {
+				clearInterval(id);
+			}
+			else if (pos <= (middlePosition-20)) { 
+				pos += 20;
+				list.style.left = pos + 'px';
+			} 
+			else if (pos <= (middlePosition-10)) {
+				pos += 10;
+				list.style.left = pos + 'px';
+			} 
+			else if (pos <= (middlePosition-5)) {
+				pos+=5; 
+				list.style.left = pos + 'px';
+			}  
+			else {
+				pos ++; 
 				list.style.left = pos + 'px';
 			}
 		}
@@ -266,7 +296,13 @@ function listMover() {
     docElem = doc.documentElement,
     body = doc.getElementsByTagName('body')[0],
 	docWidth = win.innerWidth || docElem.clientWidth || body.clientWidth;
-	list.style.right = docWidth*.46+'px';
+	list.style.left = docWidth*.42+'px';
+}; 
+
+function getDocWidth() {
+	return window.innerWidth||
+		   document.documentElement.clientWidth|| 
+		   document.getElementsByTagName('body')[0].clientWidth;
 };
 
 
