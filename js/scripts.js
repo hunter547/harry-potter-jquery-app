@@ -275,18 +275,15 @@ potterCharacterRepository.loadList().then(()=>{
 	potterCharacterRepository.getAll().forEach((potterCharacter)=>{
   		potterCharacterRepository.addListItem(potterCharacter);
   }); 
-	potterCharacterTitle.removeChild(potterCharacterLoadingMessage);
+	potterCharacterTitle.removeChild(potterCharacterLoadingMessage); 
+	backgroundResizer();	
 });  
 
 
 var list = document.getElementById('list');
 listMover();
     
-let scrollHeight = Math.max(
-  document.body.scrollHeight, document.documentElement.scrollHeight,
-  document.body.offsetHeight, document.documentElement.offsetHeight,
-  document.body.clientHeight, document.documentElement.clientHeight
-);
+
 
 window.addEventListener('resize', listMover); 
 
@@ -303,11 +300,19 @@ function getDocWidth() {
 	return window.innerWidth||
 		   document.documentElement.clientWidth|| 
 		   document.getElementsByTagName('body')[0].clientWidth;
-};
+}; 
 
+// Resizes the background image based on the height of list and the html
+function backgroundResizer() {
+	var listHeight = list.getBoundingClientRect().height; 
+	var htmlHeight = document.getElementsByTagName('html')[0].getBoundingClientRect().height; 
+	var totalHeight = listHeight + htmlHeight
+	document.body.style.backgroundSize = 'auto '+ totalHeight +'px';
+}
 
 document.body.style.backgroundImage = 'url(img/hogwarts-express-painting-27.jpg)';
-document.body.style.backgroundRepeat = 'no-repeat';
-// document.body.style.backgroundSize = docWidth+'px '+ scrollHeight+'px';
-document.body.style.backgroundSize = 'cover';
+document.body.style.backgroundRepeat = 'no-repeat'
+
+
+
 
