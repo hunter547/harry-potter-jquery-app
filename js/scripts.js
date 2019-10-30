@@ -194,7 +194,7 @@ var potterCharacterRepository = (function () {
 		$modalContainer.appendChild(modal);
 
 		// Display the modal after all content has been set 
-		$modalContainer.classList.add('is-visible');  
+		$modalContainer.classList.add('is-visible');
 	}  
 
 
@@ -292,8 +292,15 @@ function listMover() {
 	doc = document,
     docElem = doc.documentElement,
     body = doc.getElementsByTagName('body')[0],
-	docWidth = win.innerWidth || docElem.clientWidth || body.clientWidth;
-	list.style.left = docWidth*.42+'px';
+	docWidth = win.innerWidth || docElem.clientWidth || body.clientWidth; 
+	// If a modal is open and the window is resized, keep the list to the left
+	if (document.querySelector('#modal-container').classList.contains('is-visible')) {
+		list.style.left = '100 px';
+	} 
+	// Else if the modal is closed and the window is resized, keep the list in the middle of the screen
+	else {
+	list.style.left = docWidth*.42+'px'; 
+	}
 }; 
 
 function getDocWidth() {
