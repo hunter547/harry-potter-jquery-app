@@ -9,9 +9,7 @@ var potterCharacterRepository = (function () {
 	} 
 
 	function loadList() {
-		return fetch(apiUrl).then(function (response) {
-			return response.json();
-		}).then(function (json) {
+		return $.ajax(apiUrl,{ dataType: 'json' }).then(function (json) {
 			json.forEach(function (character) { 
 				var potterCharacter = {
 					name: character.name, 
@@ -34,19 +32,17 @@ var potterCharacterRepository = (function () {
 
 	// Display all potterCharacter in the repository
 	function addListItem(potterCharacter) {
-		var potterCharacterListItem = document.createElement('LI'); 
-		var potterCharacterLIButton = document.createElement('BUTTON'); 
-		potterCharacterLIButton.classList.add('potter-character-buttons');
-		potterCharacterLIButton.innerText = potterCharacter.name; 
-		potterCharacterLIButton.style.backgroundImage = potterCharacter.imageUrl;
-		potterCharacterListItem.appendChild(potterCharacterLIButton); 
-		potterCharacterList.appendChild(potterCharacterListItem); 
+		var potterCharacterListItem = $('<li></li>'); 
+		var potterCharacterLIButton = $('<button class="potter-character-buttons">'
+										+potterCharacter.name+'</button>');
+		$(potterCharacterListItem).append(potterCharacterLIButton); 
+		$(potterCharacterList).append(potterCharacterListItem); 
 		addPotterCharacterListener(potterCharacterLIButton, potterCharacter);
 	}  
 
 	// Creates event listeners for the buttons as they are being created.
 	function addPotterCharacterListener (button, potterCharacter) {
-		button.addEventListener('click', function() {
+		$(button).on('click', function() {
 			showModal(potterCharacter); 
 			moveListLeft();
 		});
@@ -55,74 +51,64 @@ var potterCharacterRepository = (function () {
 	// MODALS
 
 	function showModal(potterCharacter) {
-		var $modalContainer = document.querySelector('#modal-container'); 
+		var $modalContainer = $('#modal-container')[0]; 
 		// Clear any existing text if being used again. 
-		$modalContainer.innerHTML = ''; 
+		$($modalContainer).empty(); 
 
 		// Will close the modal container if the user clicks out side of the modal div 
-		$modalContainer.addEventListener('click', (e) => {
+		$($modalContainer).on('click', (e) => {
 		 	var target = e.target;
 		  	if (target === $modalContainer) {
-		  	hideModal();
+		  		hideModal();
 			}
 		}); 
 
 		// Create a modal div to go into the container 
-		var modal = document.createElement('div'); 
-		modal.classList.add('modal'); 
+		var modal = $('<div class="modal"></div>');
 
-		// Give the modal some content based on the potterCharacter and UI elements  
-		var closeButton = document.createElement('BUTTON'); 
-		closeButton.classList.add('modal-close'); 
-		closeButton.innerText = 'Close'; 
-		closeButton.addEventListener('click', hideModal);
+		// Give the modal a close button and title  
+		var closeButton = $('<button class="modal-close">Close</button>');
+		$(closeButton).on('click', hideModal);
 
-		var modalTitle = document.createElement('H1'); 
-		modalTitle.innerText = potterCharacter.name; 
+		var modalTitle = $('<h1>'+potterCharacter.name+'</h1>'); 
 
 		// Main modal content div that all other divs will go into
-		var modalBodyDiv = document.createElement('div'); 
-		modalBodyDiv.classList.add('modal-body-div'); 
+		var modalBodyDiv = $('<div class="modal-body-div"></div>'); 
 
  		// Create a div that the species and patronus data will go into
-		var modalSpeciesPatronusTablesDiv = document.createElement('div');
-		modalSpeciesPatronusTablesDiv.classList.add('modal-body-text-div'); 
+		var modalSpeciesPatronusTablesDiv = $('<div class="modal-body-text-div"></div>'); 
 
 		// Species data table
-		var modalSpeciesTable = document.createElement('table'); 
-		modalSpeciesTable.classList.add('species-table');
-		modalSpeciesPatronusTablesDiv.appendChild(modalSpeciesTable); 
-		var modalSpeciesHeader = modalSpeciesTable.createTHead(); 
-		modalSpeciesHeader.classList.add('species-header'); 
+		var modalSpeciesTable = $('<table class="species-table"></table>');
+		$(modalSpeciesPatronusTablesDiv).append(modalSpeciesTable); 
+		var modalSpeciesHeader = modalSpeciesTable[0].createTHead(); 
+		$(modalSpeciesHeader).addClass('species-header'); 
 		var speciesHeaderRow = modalSpeciesHeader.insertRow(0); 
-		speciesHeaderRow.innerText = 'Species'; 
-		var speciesRow = modalSpeciesTable.insertRow(1); 
+		$(speciesHeaderRow).text('Species'); 
+		var speciesRow = modalSpeciesTable[0].insertRow(1); 
 		var speciesCell = speciesRow.insertCell(0); 
-		speciesCell.innerText = potterCharacter.species.charAt(0).toUpperCase() + potterCharacter.species.slice(1); 
+		$(speciesCell).text(potterCharacter.species.charAt(0).toUpperCase() + potterCharacter.species.slice(1)); 
 
 		// Patronus data table 
-		var modalPatronusTable = document.createElement('table'); 
-		modalPatronusTable.classList.add('patronus-table'); 
-		modalSpeciesPatronusTablesDiv.appendChild(modalPatronusTable); 
-		var modalPatronusHeader = modalPatronusTable.createTHead(); 
-		modalPatronusHeader.classList.add('patronus-header'); 
+		var modalPatronusTable = $('<table class="patronus-table"></table>');
+		$(modalSpeciesPatronusTablesDiv).append(modalPatronusTable); 
+		var modalPatronusHeader = modalPatronusTable[0].createTHead(); 
+		$(modalPatronusHeader).addClass('patronus-header'); 
 		var patronusHeaderRow = modalPatronusHeader.insertRow(0); 
-		patronusHeaderRow.innerText = 'Patronus'; 
-		var patronusRow = modalPatronusTable.insertRow(1); 
+		$(patronusHeaderRow).text('Patronus'); 
+		var patronusRow = modalPatronusTable[0].insertRow(1); 
 		var patronusCell = patronusRow.insertCell(0); 
-		patronusCell.innerText = potterCharacter.patronus.charAt(0).toUpperCase() + potterCharacter.patronus.slice(1); 
+		$(patronusCell).text(potterCharacter.patronus.charAt(0).toUpperCase() + potterCharacter.patronus.slice(1)); 
 		if (potterCharacter.patronus === '') {
-			patronusCell.innerText = 'Unknown';
+			$(patronusCell).text('Unknown');
 		}
 
 		
-		var modalTableDiv = document.createElement('div'); 
-		modalTableDiv.classList.add('modal-table-div'); 
-		var modalWandTable = document.createElement('table'); 
-		modalWandTable.classList.add('wand-table');
-		modalTableDiv.appendChild(modalWandTable); 
+		var modalTableDiv = $('<div class="modal-table-div"></div>')[0];
+		var modalWandTable = $('<table class="wand-table"></table>')[0];
+		$(modalTableDiv).append(modalWandTable); 
 		var modalWandTblHead = modalWandTable.createTHead(); 
-		modalWandTblHead.classList.add('wand-header');
+		$(modalWandTblHead).addClass('wand-header');
 		var wandHeaderRow = modalWandTblHead.insertRow(0); 
 		
 		var wandHeaderText = 'Wand Unknown'; 
@@ -135,25 +121,25 @@ var potterCharacterRepository = (function () {
 			// Wand Wood Table Content
 			var woodRow =  modalWandTable.insertRow(1);
 			var woodLabel = woodRow.insertCell(0); 
-			woodLabel.innerText = 'Wood: '; 
-			woodRow.classList.add('wand-table'); 
+			$(woodLabel).text('Wood: '); 
+			$(woodRow).addClass('wand-table'); 
 			var woodCell = woodRow.insertCell(1); 
 			var woodText = potterCharacter.wand.wood.charAt(0).toUpperCase() + potterCharacter.wand.wood.slice(1);
-			woodCell.innerText = woodText; 
+			$(woodCell).text(woodText); 
 			
 
 
 			// Wand Core Table Content
 			var coreRow = modalWandTable.insertRow(2); 
 			var coreLabel = coreRow.insertCell(0); 
-			coreLabel.innerText = 'Core: ';
-			coreRow.classList.add('wand-table');
+			$(coreLabel).text('Core: ');
+			$(coreRow).addClass('wand-table');
 			var coreCell = coreRow.insertCell(1); 
 			var coreText = potterCharacter.wand.core.charAt(0).toUpperCase() + potterCharacter.wand.core.slice(1);
 			if (coreText === '') {
 				coreText = 'Core Unknown';
 			}
-			coreCell.innerText = coreText; 
+			$(coreCell).text(coreText); 
 			
 
 
@@ -161,52 +147,49 @@ var potterCharacterRepository = (function () {
 			// Wand Length Table Content
 			var lengthRow = modalWandTable.insertRow(3); 
 			var lengthLabel = lengthRow.insertCell(0); 
-			lengthLabel.innerText = 'Length: ';
-			lengthRow.classList.add('wand-table'); 
+			$(lengthLabel).text('Length: ');
+			$(lengthRow).addClass('wand-table'); 
 			var lengthCell = lengthRow.insertCell(1); 
 			var lengthText = potterCharacter.wand.length + ' in'; 
 			if (lengthText === ' in') {
 				lengthText = 'Length Unknown';
 			} 
-			lengthCell.innerText = lengthText; 	
+			$(lengthCell).text(lengthText); 	
 
 		} 
-		wandHeaderRow.innerText = wandHeaderText;
+		$(wandHeaderRow).text(wandHeaderText);
 
 
 
 
-		var modalImage = document.createElement('IMG'); 
-		modalImage.classList.add('character-picture');
-		modalImage.src = potterCharacter.imageUrl;
-		var modalImageDiv = document.createElement('div'); 
-		modalImageDiv.classList.add('modal-image-div')
-		modalImageDiv.appendChild(modalImage);
+		var modalImage = $('<img class="character-picture" src="'+ potterCharacter.imageUrl+'">')
+		var modalImageDiv = $('<div class="modal-image-div"></div>');
+		$(modalImageDiv).append(modalImage);
 
-		modal.appendChild(closeButton); 
-		modal.appendChild(modalTitle);
-		modalBodyDiv.appendChild(modalImageDiv);
-		modalBodyDiv.appendChild(modalSpeciesPatronusTablesDiv); 
-		modalBodyDiv.appendChild(modalTableDiv); 
-		modal.appendChild(modalBodyDiv);
+		$(modal).append(closeButton); 
+		$(modal).append(modalTitle);
+		$(modalBodyDiv).append(modalImageDiv);
+		$(modalBodyDiv).append(modalSpeciesPatronusTablesDiv); 
+		$(modalBodyDiv).append(modalTableDiv); 
+		$(modal).append(modalBodyDiv);
 		
 
-		$modalContainer.appendChild(modal);
+		$($modalContainer).append(modal);
 
 		// Display the modal after all content has been set 
-		$modalContainer.classList.add('is-visible');
+		$($modalContainer).addClass('is-visible');
 	}  
 
 
-	function hideModal() {
-		document.querySelector('#modal-container').classList.remove('is-visible'); 
+	function hideModal() { 
+		$('#modal-container').removeClass('is-visible'); 
 		moveListRight();
 	}
 
 	// Add a listener that will close the modal if the user presses the escape button
-	window.addEventListener('keydown', (e) => {
-		var $modalContainer = document.querySelector('#modal-container');
-		if (e.key === 'Escape' && $modalContainer.classList.contains('is-visible')) {
+	$(window).on('keydown', (e) => {
+		var $modalContainer = $('#modal-container');
+		if (e.key === 'Escape' && $($modalContainer.hasClass('is-visible'))) {
 			hideModal();
 		}
 	}); 
@@ -263,63 +246,52 @@ var potterCharacterRepository = (function () {
 })(); 
 
 
-var potterCharacterLoadingMessage = document.createElement('p'); 
-potterCharacterLoadingMessage.innerText = 'Loading...'; 
-potterCharacterLoadingMessage.classList.add('loading-message');
-var potterCharacterTitle = document.getElementById('title'); 
-potterCharacterTitle.appendChild(potterCharacterLoadingMessage); 
-var potterCharacterList = document.querySelector('.potter-list'); 
+var potterCharacterLoadingMessage = $('<p class="loading-message">Loading...</p>');
+var potterCharacterTitle = $('#title'); 
+$(potterCharacterTitle).append(potterCharacterLoadingMessage); 
+var potterCharacterList = $('.potter-list'); 
 
 potterCharacterRepository.loadList().then(()=>{
   // Data loaded successfully
 	potterCharacterRepository.getAll().forEach((potterCharacter)=>{
   		potterCharacterRepository.addListItem(potterCharacter);
   }); 
-	potterCharacterTitle.removeChild(potterCharacterLoadingMessage); 
+	$(potterCharacterLoadingMessage).remove(); 
 	backgroundResizer();	
 });  
 
 
-var list = document.getElementById('list');
+var list = $('#list')[0];
 listMover();
     
 
 
-window.addEventListener('resize', listMover); 
+$(window).on('resize', listMover); 
 
 function listMover() { 
-	var win = window,
-	doc = document,
-    docElem = doc.documentElement,
-    body = doc.getElementsByTagName('body')[0],
-	docWidth = win.innerWidth || docElem.clientWidth || body.clientWidth; 
+	docWidth = window.innerWidth || $('body')[0].clientWidth; 
 	// If a modal is open and the window is resized, keep the list to the left
-	if (document.querySelector('#modal-container').classList.contains('is-visible')) {
+	if ($('#modal-container').hasClass('is-visible')) {
 		list.style.left = '100 px';
 	} 
 	// Else if the modal is closed and the window is resized, keep the list in the middle of the screen
 	else {
-	list.style.left = docWidth*.42+'px'; 
+		list.style.left = docWidth*.42+'px'; 
 	}
 }; 
 
 function getDocWidth() {
 	return window.innerWidth||
-		   document.documentElement.clientWidth|| 
-		   document.getElementsByTagName('body')[0].clientWidth;
+		   $('body')[0].clientWidth;
 }; 
 
 // Resizes the background image based on the height of list and the html
 function backgroundResizer() {
 	var listHeight = list.getBoundingClientRect().height; 
-	var htmlHeight = document.getElementsByTagName('html')[0].getBoundingClientRect().height; 
+	var htmlHeight = $('html')[0].getBoundingClientRect().height; 
 	var totalHeight = listHeight + htmlHeight
-	document.body.style.backgroundSize = 'auto '+ totalHeight +'px';
+	$('body')[0].style.backgroundSize = 'auto '+ totalHeight +'px';
 }
 
-document.body.style.backgroundImage = 'url(img/hogwarts-express-painting-27.jpg)';
-document.body.style.backgroundRepeat = 'no-repeat'
-
-
-
-
+$('body')[0].style.backgroundImage = 'url(img/hogwarts-express-painting-27.jpg)';
+$('body')[0].style.backgroundRepeat = 'no-repeat';
