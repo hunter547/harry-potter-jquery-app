@@ -211,18 +211,18 @@ var potterCharacterRepository = (function () {
 	}); 
 
 	// Have an animation that moves the list from the center to the left when clicking a character 
-	// function moveListLeft() {
-	// 	var pos = listPosition.left;
-	// 	var id = setInterval(frame, 1);
-	// 	function frame() {
-	// 		if (pos == 0) {
-	// 			clearInterval(id);
-	// 		} else {
-	// 			pos--;
-	// 			list.style.left = pos + 'px';
-	// 		}
-	// 	}
-	// }
+	function moveListLeft() {
+		var pos = list.getBoundingClientRect().left;
+		var id = setInterval(frame, 1);
+		function frame() {
+			if (pos < 100) {
+				clearInterval(id);
+			} else {
+				pos -= 20;
+				list.style.left = pos + 'px';
+			}
+		}
+	}
 
 	return {
 		add: add,
@@ -248,21 +248,30 @@ potterCharacterRepository.loadList().then(()=>{
 	potterCharacterTitle.removeChild(potterCharacterLoadingMessage);
 });  
 
-var list = document.getElementById('list'); 
-var listHeight = list.getBoundingClientRect().top - list.getBoundingClientRect().bottom;
-var titleHeight = document.getElementById('title').scrollHeight; 
-console.log(list.getBoundingClientRect().top + ' ' + list.getBoundingClientRect().bottom);
-var win = window,
-    doc = document,
+
+var list = document.getElementById('list');
+listMover();
+    
+let scrollHeight = Math.max(
+  document.body.scrollHeight, document.documentElement.scrollHeight,
+  document.body.offsetHeight, document.documentElement.offsetHeight,
+  document.body.clientHeight, document.documentElement.clientHeight
+);
+
+window.addEventListener('resize', listMover); 
+
+function listMover() { 
+	var win = window,
+	doc = document,
     docElem = doc.documentElement,
     body = doc.getElementsByTagName('body')[0],
-    x = win.innerWidth || docElem.clientWidth || body.clientWidth,
-    y = win.innerHeight|| docElem.clientHeight|| body.clientHeight;
-list.style.right = x/2 +'px'; 
+	docWidth = win.innerWidth || docElem.clientWidth || body.clientWidth;
+	list.style.right = docWidth*.46+'px';
+};
 
 
 document.body.style.backgroundImage = 'url(img/hogwarts-express-painting-27.jpg)';
 document.body.style.backgroundRepeat = 'no-repeat';
-document.body.style.backgroundSize = x+'px '+ (listHeight+titleHeight)+'px';
-
+// document.body.style.backgroundSize = docWidth+'px '+ scrollHeight+'px';
+document.body.style.backgroundSize = 'cover';
 
