@@ -1,6 +1,6 @@
 // An Immediately Invoked Function Expression to instantiate a potterCharacter repository and protect it from being accessed globally
 var potterCharacterRepository = (function () {
-	var repository = []; 
+	var repository = [];
 	var apiUrl = 'http://hp-api.herokuapp.com/api/characters/';
 
 	// Add new potterCharacter to the repository
@@ -12,7 +12,7 @@ var potterCharacterRepository = (function () {
 		return $.ajax(apiUrl,{ dataType: 'json' }).then(function (json) {
 			json.forEach(function (character) { 
 				var potterCharacter = {
-					name: character.name, 
+					name: character.name,
 					imageUrl: character.image,
 					species: character.species, 
 					wand: character.wand,  
@@ -32,7 +32,7 @@ var potterCharacterRepository = (function () {
 
 	// Display all potterCharacter in the repository
 	function addListItem(potterCharacter) {
-		var potterCharacterListItem = $('<li></li>'); 
+		var potterCharacterListItem = $('<li id="'+potterCharacter.name.toLowerCase().replace(/\s/g,'')+'"></li>'); 
 		var potterCharacterLIButton = $('<button class="potter-character-buttons">'
 										+potterCharacter.name+'</button>');
 		$(potterCharacterListItem).append(potterCharacterLIButton); 
@@ -235,7 +235,7 @@ var potterCharacterRepository = (function () {
 				list.style.left = pos + 'px';
 			}
 		}
-	}
+	} 
 
 	return {
 		add: add,
@@ -261,18 +261,39 @@ potterCharacterRepository.loadList().then(()=>{
 });  
 
 
-var list = $('#list')[0];
-listMover();
-    
+
+$('<input type="text" id="search" class="search-box" placeholder="Search for names..." title="Look for a Harry Potter character">').insertAfter($('#title')); 
+
+$('#search').keyup(filterList); 
+var list = $('#list')[0]; 
+var searchBox = $('#search')[0]; 
+searchBox.focus();
+listMover(); 
+
+function filterList() {
+	var textValue = $('#search')[0].value.toUpperCase();
+	$.each(potterCharacterRepository.getAll(),(k,v) => {
+		var stringToMatch = v.name.substring(0, textValue.length).toUpperCase(); 
+		if (textValue === stringToMatch) {
+			$('#'+v.name.toLowerCase().replace(/\s/g,''))[0].style.display = '';
+		} 
+		else {
+			$('#'+v.name.toLowerCase().replace(/\s/g,''))[0].style.display = 'none';
+		}
+	})
+};
 
 
 $(window).on('resize', listMover); 
 
 function listMover() { 
 	docWidth = window.innerWidth || $('body')[0].clientWidth; 
+	searchBox.style.left = docWidth*.80 +'px'; 
+	searchBox.style.top = '98px'
+
 	// If a modal is open and the window is resized, keep the list to the left
 	if ($('#modal-container').hasClass('is-visible')) {
-		list.style.left = '100 px';
+		list.style.left = '100 px'; 
 	} 
 	// Else if the modal is closed and the window is resized, keep the list in the middle of the screen
 	else {
